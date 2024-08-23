@@ -83,7 +83,7 @@ def mirror_point(x0, y0, A, B, C):
     y_mirror = 2 * y_p - y0
     return x_mirror, y_mirror
 
-def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt):
+def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt1, alt2):
     if not waypoints:
         raise ValueError("No waypoints available to process.")
     
@@ -106,30 +106,47 @@ def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt):
     transformer_to_latlon = pyproj.Transformer.from_proj(utm, wgs84)
     
     mirrored_and_offset_waypoints = []
+
     for wp in waypoints:
         lat, lon = wp['lat'], wp['lon']
         if lat is not None and lon is not None and lat != 0 and lon != 0:
             x, y = transformer_to_utm.transform(lon, lat)
             
-            # Mirror the point
-            x_mirror, y_mirror = mirror_point(x, y, A, B, C)
-            
-            # Apply offsets
-            x_offset = x_mirror + dx
-            y_offset = y_mirror + dy
-            
-            # Convert back to latitude/longitude
-            lon_new, lat_new = transformer_to_latlon.transform(x_offset, y_offset)
-            
+            if wp['index'] in [4]:
+                # Apply offsets
+                x_offset = x + dx
+                y_offset = y + dy
+                lon5_new, lat5_new = transformer_to_latlon.transform(x_offset, y_offset)
+            if wp['index'] in [3]:
+                # Apply offsets
+                x_offset = x + dx
+                y_offset = y + dy
+                lon6_new, lat6_new = transformer_to_latlon.transform(x_offset, y_offset)
+             
             new_wp = wp.copy()
-            new_wp['lat'] = lat_new
-            new_wp['lon'] = lon_new
-            new_wp['alt'] = alt  # Set altitude to new value
+            new_wp['lat'] = lat
+            new_wp['lon'] = lon
+            if wp['index'] in [5]:
+                new_wp['lon'] = lon5_new
+                new_wp['lat'] = lat5_new   # Set altitude to new value
+            if wp['index'] in [6]:
+                new_wp['lon'] = lon6_new 
+                new_wp['lat'] = lat6_new   # Set altitude to new value
+
+            if wp['index'] in [0, 1, 2, 3, 4]:
+                new_wp['alt'] = alt1  # Set altitude to new value
+            if wp['index'] in [5, 6, 7]:
+                new_wp['alt'] = alt2  # Set altitude to new value
+
             mirrored_and_offset_waypoints.append(new_wp)
         else:
             # Set altitude to new value for points with zero latitude or longitude
             new_wp = wp.copy()
-            new_wp['alt'] = alt
+            if wp['index'] in [0, 1, 2, 3, 4]:
+                new_wp['alt'] = alt1  # Set altitude to new value
+            if wp['index'] in [5, 6, 7]:
+                new_wp['alt'] = alt2  # Set altitude to new value
+
             mirrored_and_offset_waypoints.append(new_wp)
     
     return mirrored_and_offset_waypoints
@@ -152,27 +169,27 @@ def create_wpl_content(waypoints):
         content.append(line)
     return "\n".join(content)
 
-def main(file_path, dx, dy, alt, task_index):
+def main(file_path, dx, dy, alt1, alt2, task_index):
     waypoints = parse_wpl_file(file_path)
     if not waypoints:
         print("No valid waypoints found. Exiting.")
         return
     
-    mirrored_and_offset_waypoints = generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt)
+    mirrored_and_offset_waypoints = generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt1, alt2)
     new_wpl_content = create_wpl_content(mirrored_and_offset_waypoints)
     
-    new_file_path = os.path.splitext(file_path)[0] + '_mirrored_offset_' + str(task_index) + '.waypoints'
+    new_file_path = os.path.splitext(file_path)[0] + '_mirrored_offset_' + str(task_index) + '_v2.waypoints'
     # new_file_path = os.path.splitext(file_path)[0] + 'ref_tmp.waypoints'
     with open(new_file_path, 'w') as file:
         file.write(new_wpl_content)
     
-    print(f"镜像偏移航线已保存到: {new_file_path}")
+    print(f"偏移航线已保存到: {new_file_path}")
 
 # Example usage
 '''
-Function: 从指定文件中读取任务点，并对所有非零位置进行镜像与偏移，并将结果（经纬高格式）写入指定文件
+Function: 从指定文件中读取任务点，并对指定index航点进行偏移，并将结果（经纬高格式）写入指定文件
 '''
-file_path = './ref1_tmp_origin_alignment.waypoints'  # specify the target waypoints file that u want to mirror and shift
+file_path = './ref1_tmp_origin_alignment_v2.waypoints'  # specify the target waypoints file that u want to mirror and shift
 # dx = 4.0  # specify the left(-)/right offset in meters
 # dy = -0.50  # specify the forward/backward(-) offset in meters
 # alt = 4.5  # specify the target altitude (m)
@@ -194,9 +211,10 @@ task_table = np.array([[4.0, -0.5, 4.5],
                        [6.0, -0.5, 6.5]]) #16
 task_sheldue = np.zeros((16, 3))
 task_sheldue[:] = task_table
-task_index = 16 # 1~16
-dx, dy, alt = task_sheldue[task_index-1]
-flag_cali = 1
+task_index = 15 # 1~16
+alt1 = 6.0
+dx, dy, alt2 = task_sheldue[task_index-1]
+flag_cali = 0
 dx += flag_cali * 0.029508704552426934      
 dy += flag_cali * 0.35594024136662483
-main(file_path, dx, dy, alt, task_index)
+main(file_path, dx, dy, alt1, alt2, task_index)

@@ -80,6 +80,7 @@ def generate_origin_alignment(waypoints, lon_cur, lat_cur, alt):
     # Calculate offsets
     dx = -(x_ref - x_cur)
     dy = -(y_ref - y_cur)
+    print('dx, dy', dx, dy)
     
     origin_alignment = []
     for wp in waypoints:
@@ -145,8 +146,13 @@ def main(file_path, lon_cur, lat_cur, alt):
 Function: 给定当前位置（经纬高格式），将指定文件中所有非零位置进行偏移与当前位置对齐，并将结果（经纬高格式）写入指定文件
 '''
 file_path = './ref1_tmp.waypoints' # specify the target waypoints that u want to align with current position
-lat_cur = 39.46348488 # current latitude of the veihcle (deg)
-lon_cur = 115.84604555 # current longitude of the veihcle (deg)
-alt = 4.5  # specify the target altitude (m)
+lat_cur = 39.463492 # current latitude of the veihcle (deg)
+lon_cur = 115.8460445 # current longitude of the veihcle (deg)
+
+# file_path = './ref1_tmp_origin_alignment_mirrored_offset_16.waypoints' # specify the target waypoints that u want to align with current position
+# lat_cur = 39.4634814 #39.4634678 # current latitude of the veihcle (deg)
+# lon_cur = 115.8461225 #115.8460539 # current longitude of the veihcle (deg)
+
+alt = 5.5  # specify the target altitude (m)
 
 main(file_path, lon_cur, lat_cur, alt)
