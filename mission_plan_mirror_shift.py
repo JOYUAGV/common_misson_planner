@@ -83,14 +83,14 @@ def mirror_point(x0, y0, A, B, C):
     y_mirror = 2 * y_p - y0
     return x_mirror, y_mirror
 
-def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt):
+def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt, mir_axes_1=3, mir_axes_2=4):
     if not waypoints:
         raise ValueError("No waypoints available to process.")
     
     wgs84 = pyproj.Proj(proj='latlong', datum='WGS84')
     
-    wp3 = next((wp for wp in waypoints if wp['index'] == 3), None)
-    wp4 = next((wp for wp in waypoints if wp['index'] == 4), None)
+    wp3 = next((wp for wp in waypoints if wp['index'] == mir_axes_1), None)
+    wp4 = next((wp for wp in waypoints if wp['index'] == mir_axes_2), None)
     
     if wp3 is None or wp4 is None:
         raise ValueError("Cannot find waypoints with index 3 and 4.")
@@ -176,7 +176,7 @@ file_path = './ref1_tmp_origin_alignment.waypoints'  # specify the target waypoi
 # dx = 4.0  # specify the left(-)/right offset in meters
 # dy = -0.50  # specify the forward/backward(-) offset in meters
 # alt = 4.5  # specify the target altitude (m)
-task_table = np.array([[4.0, -0.5, 4.5],
+task_table = np.array([[7.0, 0.0, 6],
                        [5.0, 0.0, 5.5],
                        [6.0, 0.5, 6.5],
                        [7.0, 1.0, 7.5],
@@ -194,9 +194,9 @@ task_table = np.array([[4.0, -0.5, 4.5],
                        [6.0, -0.5, 6.5]]) #16
 task_sheldue = np.zeros((16, 3))
 task_sheldue[:] = task_table
-task_index = 16 # 1~16
+task_index = 1 # 1~16
 dx, dy, alt = task_sheldue[task_index-1]
-flag_cali = 1
+flag_cali = 0
 dx += flag_cali * 0.029508704552426934      
 dy += flag_cali * 0.35594024136662483
 main(file_path, dx, dy, alt, task_index)

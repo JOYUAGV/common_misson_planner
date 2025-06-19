@@ -189,11 +189,11 @@ def main(file_path, dx, dy, alt1, alt2, task_index):
 '''
 Function: 从指定文件中读取任务点，并对指定index航点进行偏移，并将结果（经纬高格式）写入指定文件
 '''
-file_path = './ref1_tmp_origin_alignment_v2.waypoints'  # specify the target waypoints file that u want to mirror and shift
+file_path = './ref1_tmp_origin_alignment.waypoints.waypoints'  # specify the target waypoints file that u want to mirror and shift
 # dx = 4.0  # specify the left(-)/right offset in meters
 # dy = -0.50  # specify the forward/backward(-) offset in meters
 # alt = 4.5  # specify the target altitude (m)
-task_table = np.array([[4.0, -0.5, 4.5],
+task_table = np.array([[7.0, 0.0, 6],
                        [5.0, 0.0, 5.5],
                        [6.0, 0.5, 6.5],
                        [7.0, 1.0, 7.5],
@@ -204,16 +204,17 @@ task_table = np.array([[4.0, -0.5, 4.5],
                        [7.0, 0.5, 5.0], #9
                        [6.0, 1.0, 5.0], #10
                        [5.0, -0.5, 7.0], #11
-                       [4.0, 0.0, 7.0], #12
+                       [5.0, 0.0, 7.0], #12
                        [5.0, 1.0, 5.5], #13
                        [4.0, 0.5, 6.5], #14
                        [7.0, 0.0, 5.5], #15
                        [6.0, -0.5, 6.5]]) #16
 task_sheldue = np.zeros((16, 3))
 task_sheldue[:] = task_table
-task_index = 15 # 1~16
+task_index = 13 # 1~16
 alt1 = 6.0
 dx, dy, alt2 = task_sheldue[task_index-1]
+# dx, dy, alt2 = [7.0, 0.0, 6]
 flag_cali = 0
 dx += flag_cali * 0.029508704552426934      
 dy += flag_cali * 0.35594024136662483
