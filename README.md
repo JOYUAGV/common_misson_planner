@@ -26,6 +26,7 @@ python mission_plan_mirror_shift.py
 # dx = 4.0  (specify the left(-)/right offset in meters)
 # dy = -0.50  （specify the forward/backward(-) offset in meters）
 # alt = 4.5  （specify the target altitude (m)）
+# mir_axes_pt1 = 3, mir_axes_pt2 = 4 (specify the target mirror axes points index)
 ```
 ![example_s2](./images/example_s2.png "example_s2")
 **Figure 2:** This is the result for example_s2.

@@ -83,14 +83,14 @@ def mirror_point(x0, y0, A, B, C):
     y_mirror = 2 * y_p - y0
     return x_mirror, y_mirror
 
-def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt, mir_axes_1=3, mir_axes_2=4):
+def generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt, mir_axes_pt1=3, mir_axes_pt2=4):
     if not waypoints:
         raise ValueError("No waypoints available to process.")
     
     wgs84 = pyproj.Proj(proj='latlong', datum='WGS84')
     
-    wp3 = next((wp for wp in waypoints if wp['index'] == mir_axes_1), None)
-    wp4 = next((wp for wp in waypoints if wp['index'] == mir_axes_2), None)
+    wp3 = next((wp for wp in waypoints if wp['index'] == mir_axes_pt1), None)
+    wp4 = next((wp for wp in waypoints if wp['index'] == mir_axes_pt2), None)
     
     if wp3 is None or wp4 is None:
         raise ValueError("Cannot find waypoints with index 3 and 4.")
@@ -152,13 +152,13 @@ def create_wpl_content(waypoints):
         content.append(line)
     return "\n".join(content)
 
-def main(file_path, dx, dy, alt, task_index):
+def main(file_path, dx, dy, alt, task_index, mir_axes_pt1, mir_axes_pt2):
     waypoints = parse_wpl_file(file_path)
     if not waypoints:
         print("No valid waypoints found. Exiting.")
         return
     
-    mirrored_and_offset_waypoints = generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt)
+    mirrored_and_offset_waypoints = generate_mirrored_and_offset_waypoints(waypoints, dx, dy, alt, mir_axes_pt1=mir_axes_pt1, mir_axes_pt2=mir_axes_pt2)
     new_wpl_content = create_wpl_content(mirrored_and_offset_waypoints)
     
     new_file_path = os.path.splitext(file_path)[0] + '_mirrored_offset_' + str(task_index) + '.waypoints'
@@ -199,4 +199,4 @@ dx, dy, alt = task_sheldue[task_index-1]
 flag_cali = 0
 dx += flag_cali * 0.029508704552426934      
 dy += flag_cali * 0.35594024136662483
-main(file_path, dx, dy, alt, task_index)
+main(file_path, dx, dy, alt, task_index, mir_axes_pt1=3, mir_axes_pt2=4)
